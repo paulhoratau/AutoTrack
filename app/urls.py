@@ -11,4 +11,9 @@ urlpatterns = [
     path('cars/', views.CarList.as_view(), name='car_list'),
     path('cars/create/', views.CarCreate.as_view(), name='car_create'),
     path('cars/<int:pk>/', views.CarDetail.as_view(), name='car_detail'),
+
+    path('repairs/', views.CarRepairList.as_view(), name='car-repair-list'),
+    path('repairs/<int:pk>/', views.CarRepairDetail.as_view(), name='car-repair-detail'),
 ]
+
+

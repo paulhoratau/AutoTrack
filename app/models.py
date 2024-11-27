@@ -7,3 +7,12 @@ class Car(models.Model):
     vin = models.CharField(max_length=17, unique=True)
     year = models.IntegerField()
     owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+class CarRepair(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    body = models.TextField(blank=False)
+    created_by = models.ForeignKey('auth.User', related_name='car_repairs', on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, related_name='repairs', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Repair for {self.car.model} ({self.car.vin}) on {self.created.strftime('%Y-%m-%d')}"
