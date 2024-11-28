@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Car, CarRepair
+from .models import Car, CarRepair, CarReminder
 
 UserModel = get_user_model()
 
@@ -24,10 +24,17 @@ class CarRepairSerializer(serializers.ModelSerializer):
         model = CarRepair
         fields = '__all__'
 
+class CarReminderSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = CarReminder
+        fields = '__all__'
 
 class CarSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
-    repairs = CarRepairSerializer(many=True, read_only=True)  # Fetch repairs using related_name
+    repairs = CarRepairSerializer(many=True, read_only=True)
+    reminders = CarReminderSerializer(many=True, read_only=True)
 
     class Meta:
         model = Car

@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
-from .models import Car, CarRepair
-from .serializers import CarSerializer, UserSerializer, CarRepairSerializer
+from .models import Car, CarRepair, CarReminder
+from .serializers import CarSerializer, UserSerializer, CarRepairSerializer, CarReminderSerializer
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -39,4 +39,14 @@ class CarRepairList(generics.ListCreateAPIView):
 class CarRepairDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CarRepair.objects.all()
     serializer_class = CarRepairSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class CarReminderListCreate(generics.ListCreateAPIView):
+    queryset = CarReminder.objects.all()
+    serializer_class = CarReminderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class CarReminderDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CarReminder.objects.all()
+    serializer_class = CarReminderSerializer
     permission_classes = [permissions.IsAuthenticated]

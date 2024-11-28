@@ -14,5 +14,12 @@ class CarRepair(models.Model):
     created_by = models.ForeignKey('auth.User', related_name='car_repairs', on_delete=models.CASCADE)
     car = models.ForeignKey(Car, related_name='repairs', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"Repair for {self.car.model} ({self.car.vin}) on {self.created.strftime('%Y-%m-%d')}"
+
+class CarReminder(models.Model):
+    car = models.ForeignKey('Car', related_name='reminders', on_delete=models.CASCADE)
+    itp = models.TextField(blank=False)
+    itp_date = models.DateTimeField()
+    road_tax = models.TextField(blank=False)
+    road_tax_date = models.DateTimeField()
+    insurance = models.TextField(blank=False)
+    insurance_date = models.DateTimeField()

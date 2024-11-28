@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('repairs/', views.CarRepairList.as_view(), name='car-repair-list'),
     path('repairs/<int:pk>/', views.CarRepairDetail.as_view(), name='car-repair-detail'),
+
+    path('car_reminders/', views.CarReminderListCreate.as_view(), name='car_reminder_create'),
+    path('car_reminders/<int:pk>/', views.CarReminderDetail.as_view(), name='car_reminder_detail'),
 ]
-
-
