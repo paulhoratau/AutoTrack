@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Car, CarRepair, CarReminder
+from .models import Car, CarRepair, CarReminder, CarModel, Booking, Key, KeyHistory, Location
 
 UserModel = get_user_model()
 
@@ -25,8 +25,6 @@ class CarRepairSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CarReminderSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = CarReminder
         fields = '__all__'
@@ -38,4 +36,36 @@ class CarSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Car
+        fields = '__all__'
+
+class BookingSerializer(serializers.ModelSerializer):
+    created_by = serializers.ReadOnlyField(source='created_by.username')
+    class Meta:
+        model = Booking
+        fields = '__all__'
+
+class CarModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarModel
+        fields = '__all__'
+
+
+class KeySerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    booking = serializers.PrimaryKeyRelatedField(queryset=Booking.objects.all())
+    start_time = serializers.DateTimeField(source='booking.start_time', read_only=True)
+    end_time = serializers.DateTimeField(source='booking.end_time', read_only=True)
+
+    class Meta:
+        model = Key
+        fields = '__all__'
+
+class KeyHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KeyHistory
+        fields = '__all__'
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
         fields = '__all__'

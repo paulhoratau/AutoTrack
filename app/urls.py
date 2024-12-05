@@ -17,4 +17,21 @@ urlpatterns = [
 
     path('car_reminders/', views.CarReminderListCreate.as_view(), name='car_reminder_create'),
     path('car_reminders/<int:pk>/', views.CarReminderDetail.as_view(), name='car_reminder_detail'),
+
+    #Bookings
+
+    path('bookings/', views.BookingListCreateView.as_view(), name='booking-list-create'),
+    path('bookings/<int:pk>/', views.BookingDetailView.as_view(), name='booking-detail'),
+
+    path('carmodels/', views.CarModelListCreateView.as_view(), name='carmodel-list-create'),
+    path('carmodels/<int:pk>/', views.CarModelDetailView.as_view(), name='carmodel-detail'),
+
+    path('keys/', views.KeyListCreateView.as_view(), name='key-list-create'),
+    path('keys/<int:pk>/', views.KeyDetailView.as_view(), name='key-detail'),
+
+    path('keyhistories/', views.KeyHistoryListCreateView.as_view(), name='keyhistory-list-create'),
+    path('keyhistories/<int:pk>/', views.KeyHistoryDetailView.as_view(), name='keyhistory-detail'),
+
+    path('locations/', views.LocationListCreateView.as_view(), name='location-list-create'),
+    path('locations/<int:pk>/', views.LocationDetailView.as_view(), name='location-detail'),
 ]
