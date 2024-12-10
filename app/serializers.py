@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Car, CarRepair, CarReminder, CarModel, Booking, Key, KeyHistory, Location
+from .validators import validate_time_overlap
 
 UserModel = get_user_model()
 
@@ -44,6 +45,19 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = '__all__'
 
+
+    def validate(self, data):
+        """
+        Validate booking data, including overlap checks.
+        """
+        instance = getattr(self, 'instance', None)
+        validate_time_overlap(
+            start_time=data.get('start_time'),
+            end_time=data.get('end_time'),
+            car=data.get('car'),
+            instance=instance
+        )
+        return data
 class CarModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarModel

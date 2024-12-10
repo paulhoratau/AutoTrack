@@ -2,7 +2,6 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Car, CarRepair, CarReminder, Booking, CarModel, Key, KeyHistory, Location
 from .serializers import CarSerializer, UserSerializer, CarRepairSerializer, CarReminderSerializer, BookingSerializer, CarModelSerializer, KeySerializer, KeyHistorySerializer, LocationSerializer
-from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminUserWithMessage, IsAuthenticatedWithMessage
 
 class CreateUserView(generics.CreateAPIView):
@@ -37,6 +36,18 @@ class CarDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CarSerializer
     permission_classes = [IsAuthenticatedWithMessage]
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Car has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
+
 
 class CarRepairList(generics.ListCreateAPIView):
     queryset = CarRepair.objects.all()
@@ -58,6 +69,18 @@ class CarRepairDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CarRepairSerializer
     permission_classes = [IsAuthenticatedWithMessage]
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Your repair has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
+
 class CarReminderListCreate(generics.ListCreateAPIView):
     queryset = CarReminder.objects.all()
     serializer_class = CarReminderSerializer
@@ -72,6 +95,18 @@ class CarReminderDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CarReminder.objects.all()
     serializer_class = CarReminderSerializer
     permission_classes = [IsAuthenticatedWithMessage]
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Reminder model has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
 
 
 class BookingListCreateView(generics.ListCreateAPIView):
@@ -100,6 +135,18 @@ class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Booking has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
+
 
 class CarModelListCreateView(generics.ListCreateAPIView):
     queryset = CarModel.objects.all()
@@ -124,6 +171,17 @@ class CarModelDetailView(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Car model has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
 class KeyListCreateView(generics.ListCreateAPIView):
     queryset = Key.objects.all()
     serializer_class = KeySerializer
@@ -150,6 +208,17 @@ class KeyDetailView(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Key has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
 
 class KeyHistoryListCreateView(generics.ListCreateAPIView):
     queryset = KeyHistory.objects.all()
@@ -186,4 +255,16 @@ class LocationDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(
             {"detail": "Location has been successfully deleted!"},
             status=status.HTTP_204_NO_CONTENT
+        )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Location has been successfully updated!"},
+            status=status.HTTP_200_OK
         )
