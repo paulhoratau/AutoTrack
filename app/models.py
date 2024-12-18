@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from .constants import VEHICLE_MANUFACTURERS, ENGINE_TYPES, KEY_STATUSES, \
     KEY_OPERATIONS, CURRENT_TYPES, EVENT_TYPES
 from model_utils.models import TimeStampedModel
-
+from django.contrib.auth.models import User
 # Create your models here.
 class TimeStampedFieldsModel(TimeStampedModel):
     """
@@ -228,3 +228,16 @@ class Device(TimeStampedFieldsModel):
 
     def __str__(self):
         return self.serial
+class Driver(models.Model):
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
+    age = models.IntegerField()
+    email = models.EmailField()
+    phone = models.IntegerField()
+    passport_id = models.CharField(max_length=10)
+class Contract(models.Model):
+    driver_id = models.ForeignKey("Driver", related_name="driver", on_delete=models.CASCADE)
+    user_id = models.ForeignKey('auth.User', related_name='contract', on_delete=models.CASCADE)
+    booking = models.ForeignKey('Booking', related_name='contract', on_delete=models.CASCADE)
+    signed = models.BooleanField(blank=False, default=False)
+    date = models.DateTimeField(auto_now_add=True)

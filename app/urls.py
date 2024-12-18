@@ -34,4 +34,13 @@ urlpatterns = [
 
     path('locations/', views.LocationListCreateView.as_view(), name='location-list-create'),
     path('locations/<int:pk>/', views.LocationDetailView.as_view(), name='location-detail'),
+
+    path('contract', views.ContractCreate.as_view(), name='contract-create'),
+    path('contract/<int:pk>', views.ContractDetail.as_view(), name='contract-create'),
+    path('contract/sign/<int:pk>/', views.SignContract.as_view(), name='sign-contract'),
+
+    path('generate_pdf', views.GenerateContractPDFView.as_view(), name='generate-pdf'),
+
+    path('create_driver', views.DriverListCreateView.as_view(), name="create-driver"),
+    path('driver/<int:pk>', views.DriverDetailView.as_view(), name="driver")
 ]

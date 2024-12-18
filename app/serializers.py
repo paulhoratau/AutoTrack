@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Car, CarRepair, CarReminder, CarModel, Booking, Key, KeyHistory, Location
+from .models import Car, CarRepair, CarReminder, CarModel, Booking, Key, KeyHistory, Location, Contract, Driver
 from .validators import validate_time_overlap
 
 UserModel = get_user_model()
@@ -82,4 +82,16 @@ class KeyHistorySerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
+        fields = '__all__'
+
+class ContractSerializer(serializers.ModelSerializer):
+    driver_id = serializers.PrimaryKeyRelatedField(queryset=Driver.objects.all())
+    class Meta:
+        model = Contract
+        fields = '__all__'
+
+
+class DriverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
         fields = '__all__'

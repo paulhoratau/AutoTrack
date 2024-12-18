@@ -3,10 +3,11 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import EventSummary, TripSummary
 from .serializers import EventSummarySerializer, TripSummarySerializer
-from .utils import meters_to_miles, calculate_total, count_by_field, generate_by_time_period
+from .utils import meters_to_miles, calculate_total, count_by_field, generate_by_time_period, get_driver_event_summary
 from django.db.models import Count, Case, When, Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 
 
@@ -45,30 +46,13 @@ class DriverEventSummaryViewSet(viewsets.ModelViewSet):
 
 class AllDriversEventSummaryViewSet(APIView):
     def get(self, request):
-        ALERT_LOW = 'low'
-        ALERT_MEDIUM = 'medium'
-        ALERT_HIGH = 'high'
-        ALERT_OVERSPEED = 'overspeed_start'
-        RELEVANT_ALERT_TYPES = [ALERT_LOW, ALERT_MEDIUM, ALERT_HIGH, ALERT_OVERSPEED]
+        user_id = self.request.query_params.get('user_id', None)
 
-        # Generate the initial queryset
-        driver_event_summary = EventSummary.objects.exclude(user=None).filter(
-            type__in=RELEVANT_ALERT_TYPES
-        ).select_related(
-            "device", "car", "booking", "key", "user"
-        ).order_by('user__email').annotate(
-            low_total=count_by_field("type", ALERT_LOW),
-            medium_total=count_by_field("type", ALERT_MEDIUM),
-            high_total=count_by_field("type", ALERT_HIGH),
-            overspeed_total=count_by_field("type", ALERT_OVERSPEED),
-            total_alerts=Count('pk')
-        )
+        driver_event_summary = get_driver_event_summary(user_id=user_id)
 
-        # Define required keys and calculate totals
         required_keys = ['low_total', 'medium_total', 'high_total', 'overspeed_total', 'total_alerts']
         driver_event_summary_total = calculate_total(required_keys, driver_event_summary)
 
-        # Return the data as a Response
         return Response(driver_event_summary_total)
 
 class TripViewSet(viewsets.ModelViewSet):

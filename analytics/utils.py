@@ -2,6 +2,13 @@ from decimal import Decimal
 from django.db.models.query import QuerySet
 from django.db.models.functions import ExtractWeekDay, ExtractHour
 from django.db.models import Count, Case, When, Sum
+from .models import EventSummary
+
+ALERT_LOW = 'low'
+ALERT_MEDIUM = 'medium'
+ALERT_HIGH = 'high'
+ALERT_OVERSPEED = 'overspeed_start'
+RELEVANT_ALERT_TYPES = [ALERT_LOW, ALERT_MEDIUM, ALERT_HIGH, ALERT_OVERSPEED]
 
 def meters_to_miles(val):
     return (val / 1000) * Decimal(0.621371)
@@ -83,3 +90,24 @@ def generate_by_time_period(qs, period, starting_index):
     summary_over_time_period_output = summary_over_time_period
 
     return summary_over_time_period_output
+
+def get_driver_event_summary(user_id=None):
+    """
+    Returns a queryset for EventSummary with optional filtering by user_id.
+    """
+    base_query = EventSummary.objects.exclude(user=None).filter(
+        type__in=RELEVANT_ALERT_TYPES
+    ).select_related(
+        "device", "car", "booking", "key", "user"
+    ).annotate(
+        low_total=count_by_field("type", ALERT_LOW),
+        medium_total=count_by_field("type", ALERT_MEDIUM),
+        high_total=count_by_field("type", ALERT_HIGH),
+        overspeed_total=count_by_field("type", ALERT_OVERSPEED),
+        total_alerts=Count('pk')
+    )
+
+    if user_id is not None:
+        base_query = base_query.filter(user__id=user_id)
+
+    return base_query

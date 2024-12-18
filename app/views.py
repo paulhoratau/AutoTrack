@@ -1,8 +1,18 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .models import Car, CarRepair, CarReminder, Booking, CarModel, Key, KeyHistory, Location
-from .serializers import CarSerializer, UserSerializer, CarRepairSerializer, CarReminderSerializer, BookingSerializer, CarModelSerializer, KeySerializer, KeyHistorySerializer, LocationSerializer
+from .models import Car, CarRepair, CarReminder, Booking, CarModel, Key, KeyHistory, Location, Contract
+from .serializers import CarSerializer, UserSerializer, CarRepairSerializer, CarReminderSerializer, BookingSerializer, CarModelSerializer, KeySerializer, KeyHistorySerializer, LocationSerializer, ContractSerializer, DriverSerializer
 from .permissions import IsAdminUserWithMessage, IsAuthenticatedWithMessage
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from rest_framework.views import APIView
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from .models import Contract, Booking, Driver
+from rest_framework.generics import RetrieveUpdateAPIView
+
+
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -268,3 +278,99 @@ class LocationDetailView(generics.RetrieveUpdateDestroyAPIView):
             {"detail": "Location has been successfully updated!"},
             status=status.HTTP_200_OK
         )
+
+class ContractCreate(generics.ListCreateAPIView):
+    queryset = Contract.objects.all()
+    serializer_class = ContractSerializer
+    permission_classes = [IsAuthenticatedWithMessage, IsAdminUserWithMessage]
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        response.data['detail'] = "Contract has been successfully created!"
+        return response
+
+
+class ContractDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Contract.objects.all()
+    serializer_class = ContractSerializer
+    permission_classes = [IsAuthenticatedWithMessage, IsAdminUserWithMessage]
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(
+            {"detail": "Your contract has been successfully updated!"},
+            status=status.HTTP_200_OK
+        )
+
+
+class GenerateContractPDFView(APIView):
+    def get(self, request, *args, **kwargs):
+        contract_id = request.query_params.get('contract_id')
+
+        contract = get_object_or_404(Contract, pk=contract_id)
+        driver = contract.driver_id
+        booking = contract.booking
+
+        response = HttpResponse(content_type='application/pdf')
+
+        p = canvas.Canvas(response, pagesize=letter)
+        width, height = letter
+
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(72, height - 72, "Contract Details")
+        p.setFont("Helvetica", 12)
+        p.drawString(72, height - 100, f"Contract ID: {contract.id}")
+        p.drawString(72, height - 120, f"Signed: {'Yes' if contract.signed else 'No'}")
+        p.drawString(72, height - 140, f"Date: {contract.date.strftime('%Y-%m-%d %H:%M:%S')}")
+
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(72, height - 180, "Booking Details")
+        p.setFont("Helvetica", 12)
+        p.drawString(72, height - 200, f"Car: {booking.car.model or 'N/A'}")
+        p.drawString(72, height - 220, f"Contract created by: {booking.created_by or 'N/A'}")
+        p.drawString(72, height - 240, f"Starts: {booking.start_time.strftime('%Y-%m-%d') if booking.start_time else 'N/A'}")
+        p.drawString(72, height - 260, f"Ends: {booking.end_time.strftime('%Y-%m-%d') if booking.end_time else 'N/A'}")
+
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(72, height - 300, "Driver Details")
+        p.setFont("Helvetica", 12)
+
+        p.drawString(72, height - 320, f"First name: {driver.first_name or 'N/A'}")
+        p.drawString(72, height - 340, f"Last name: {driver.last_name or 'N/A'}")
+        p.drawString(72, height - 360, f"Age: {driver.age or 'N/A'}")
+        p.drawString(72, height - 380, f"Email: {driver.email or 'N/A'}")
+        p.drawString(72, height - 400, f"Phone number: {driver.phone or 'N/A'}")
+        p.drawString(72, height - 420, f"Passport id: {driver.passport_id or 'N/A'}")
+
+        p.showPage()
+        p.save()
+
+        return response
+
+
+
+class DriverListCreateView(generics.ListCreateAPIView):
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+    permission_classes = [IsAuthenticatedWithMessage, IsAdminUserWithMessage]
+
+class DriverDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+    permission_classes = [IsAuthenticatedWithMessage, IsAdminUserWithMessage]
+
+class SignContract(generics.UpdateAPIView):
+    queryset = Contract.objects.filter(signed=False)
+    serializer_class = ContractSerializer
+    permission_classes = [IsAuthenticatedWithMessage]
+
+    def perform_update(self, serializer):
+        serializer.save(signed=True)

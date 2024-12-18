@@ -38,7 +38,13 @@ REST_FRAMEWORK = {
 
         'rest_framework_simplejwt.authentication.JWTAuthentication',
 
-    )
+    ),
+
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',  # Adaugă suport pentru x-www-form-urlencoded
+        'rest_framework.parsers.MultiPartParser',  # Pentru upload de fișiere
+    ]
 
 }
 
