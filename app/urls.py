@@ -43,4 +43,6 @@ urlpatterns = [
 
     path('create_driver', views.DriverListCreateView.as_view(), name="create-driver"),
     path('driver/<int:pk>', views.DriverDetailView.as_view(), name="driver")
+
+    
 ]

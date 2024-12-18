@@ -54,13 +54,11 @@ class Car(TimeStampedFieldsModel):
     registration_number = models.CharField(max_length=10)
     location = models.ForeignKey("Location", related_name="cars", verbose_name="current location", on_delete=models.CASCADE)
 
-
 class CarRepair(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     body = models.TextField(blank=False)
     created_by = models.ForeignKey('auth.User', related_name='car_repairs', on_delete=models.CASCADE)
     car = models.ForeignKey(Car, related_name='repairs', on_delete=models.CASCADE)
-
 
 class CarReminder(models.Model):
     car = models.ForeignKey('Car', related_name='reminders', on_delete=models.CASCADE)
@@ -70,10 +68,6 @@ class CarReminder(models.Model):
     road_tax_date = models.DateTimeField()
     insurance = models.TextField(blank=False)
     insurance_date = models.DateTimeField()
-
-
-
-
 class Booking(TimeStampedFieldsModel):
     created_by = models.ForeignKey('auth.User', related_name='booking', on_delete=models.CASCADE)
     start_location = models.ForeignKey("Location", related_name="bookings_starting", verbose_name="Pick up location", on_delete=models.CASCADE)
@@ -81,7 +75,6 @@ class Booking(TimeStampedFieldsModel):
     start_time = models.DateTimeField(db_index=True)
     end_time = models.DateTimeField(db_index=True)
     car = models.ForeignKey('Car', related_name='booking', on_delete=models.CASCADE)
-
 
 class CarModel(TimeStampedFieldsModel):
     brand = models.CharField(max_length=12, choices=VEHICLE_MANUFACTURERS, default="BMW")
@@ -94,7 +87,6 @@ class CarModel(TimeStampedFieldsModel):
 
 
 class Key(TimeStampedFieldsModel):
-    keycore_id = models.AutoField(primary_key=True, blank=True)
     user = models.ForeignKey('auth.User', related_name='keys', on_delete=models.CASCADE)
     booking = models.ForeignKey("Booking", related_name="keys", on_delete=models.CASCADE)
     is_put_back = models.BooleanField(default=False)
@@ -109,21 +101,13 @@ class KeyHistory(models.Model):
     status = models.CharField(max_length=9, choices=KEY_STATUSES)
     created = models.DateTimeField(auto_now_add=True)
 
-
-
 class Location(TimeStampedFieldsModel):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255,)
     city = models.CharField(max_length=255, verbose_name="Town / City")
     county = models.CharField(max_length=50)
     postcode = models.CharField(max_length=10)
-
 class IdentityMixin(models.Model):
-    device = models.ForeignKey(
-        "Device",
-        related_name='%(class)ss',
-        on_delete=models.CASCADE
-    )
     car = models.ForeignKey(
         "Car",
         related_name='%(class)ss',
@@ -150,7 +134,6 @@ class IdentityMixin(models.Model):
 
     class Meta:
         abstract = True
-
 
 class Event(IdentityMixin, TimeStampedFieldsModel):
     event_id = models.CharField(
@@ -202,32 +185,6 @@ class Trip(IdentityMixin, TimeStampedFieldsModel):
     def timestamp(self):
         return self.start
 
-class Device(TimeStampedFieldsModel):
-    serial = models.CharField(
-        primary_key=True,
-        max_length=50,
-        editable=False,
-    )
-    project_id = models.CharField(
-        max_length=50
-    )
-    license_plate = models.CharField(
-        max_length=50
-    )
-    zone = models.CharField(
-        max_length=50
-    )
-    car = models.ForeignKey(
-        Car,
-        null=True,
-        on_delete=models.SET_NULL
-    )
-
-    class Meta:
-        ordering = ['serial']
-
-    def __str__(self):
-        return self.serial
 class Driver(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)

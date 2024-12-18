@@ -19,4 +19,4 @@ class EventSummarySerializer(serializers.ModelSerializer):
     total_alerts = serializers.IntegerField()
     class Meta:
         model = EventSummary
-        fields = ['user_id', 'user_email', 'low_total', 'medium_total', 'high_total', 'overspeed_total', 'total_alerts']
+        fields = '__all__'

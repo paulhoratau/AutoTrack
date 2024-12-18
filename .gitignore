@@ -8,10 +8,7 @@ __pycache__/
 
 db_sqlite3
 autotrackenv/
-<<<<<<< HEAD
 
-=======
->>>>>>> 73cff74 (Ignore autotrackenv directory)
 # Distribution / packaging
 .Python
 build/
